@@ -1,4 +1,5 @@
 import gymnasium as gym
+import numpy as np
 
 from controllers.random import RandomController
 
@@ -7,6 +8,7 @@ env = gym.make("Pendulum-v1", render_mode="human", g=9.81)
 controller = RandomController(env)
 
 env.reset()
+env.unwrapped.state = np.array([3.14, 0.0])
 
 episode_reward = 0.
 for i in range(n_steps):
