@@ -17,7 +17,7 @@ class BasicSamplingController(Controller):
         best_action = None
         max_reward = -np.inf
         
-        self.env.unwrapped.state = env.unwrapped.state.copy()
+        self.env.unwrapped.state = env.unwrapped.state
 
         for _ in range(self.n_samples):
             state = self.env.unwrapped.state
@@ -29,8 +29,8 @@ class BasicSamplingController(Controller):
                 actions.append(action)
                 observation, reward, terminated, truncated, info = self.env.step(action)
                 total_reward += reward
-                if terminated or truncated:
-                    break
+
+            self.env.unwrapped.state = state
 
             if total_reward > max_reward:
                 max_reward = total_reward
