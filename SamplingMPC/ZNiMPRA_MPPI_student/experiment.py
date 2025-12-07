@@ -67,5 +67,15 @@ def task7():
         observation, reward, terminated, truncated, info = env.step(action)
         env.render()
 
+def task9():
+    n_steps = 200
+    env = gym.make("Hopper-v5", render_mode="human")
+    env.reset()
+    controller = MPPIController(env_name="Hopper-v5", N=15, T=50, sigma=1.0, min_u=-1.0, max_u=1.0)
+    for i in range(n_steps):
+        action = controller.compute_control(env)
+        observation, reward, terminated, truncated, info = env.step(action)
+        env.render()
+
 if __name__ == '__main__':
-    task7()
+    task9()
