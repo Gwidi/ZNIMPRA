@@ -12,28 +12,30 @@ class MPPIController(Controller):
         self.env.reset()
         super().__init__(self.env)       
         self.sigma = sigma
-        self.N = N
-        self.T = T
-        self.lambda_ = lambda_
+        self.N = N # Number of trajectories
+        self.T = T # Time horizon
+        self.lambda_ = lambda_ # Temperature parameter
         self.min_u = min_u
         self.max_u = max_u
-        self.num_iters = 1
-        
+        # Add interferences to the model
+        self.env.unwrapped.m = 1.5
+        self.env.unwrapped.l = 1.2
+         
         self.u_star = np.zeros((self.T, self.actions))  # Initial control sequence
     
     def compute_control(self, env) -> np.ndarray:
         state = env.unwrapped.state
-        self.u_star = np.roll(self.u_star, -1, axis=0)
-        self.u_star[-1, :] = 0
-        u = np.tile(self.u_star[:, :, None], (1, 1, self.N))
-        delta_u = np.zeros((self.T, self.actions, self.N))
-        S = np.zeros(self.N)
-        omega = np.zeros(self.N)
+        self.u_star = np.roll(self.u_star, -1, axis=0) # Shift control sequence
+        self.u_star[-1, :] = 0 # Set last control to zero
+        u = np.tile(self.u_star[:, :, None], (1, 1, self.N)) # Replicate control sequence for all trajectories
+        delta_u = np.zeros((self.T, self.actions, self.N)) # To store control perturbations
+        S = np.zeros(self.N) # To store cumulative rewards
+        omega = np.zeros(self.N) # To store weights
         
         for traj in range(self.N):
             self.env.unwrapped.state = state
             for t in range(self.T):
-                noise = np.random.normal(0, self.sigma, size=self.actions)
+                noise = np.random.normal(0, self.sigma, size=self.actions) # Generate noise
                 u[t, :, traj] += noise
                 u[t, :, traj] = np.clip(u[t, :, traj], self.min_u, self.max_u)
                 delta_u[t, :, traj] = u[t, :, traj] - self.u_star[t, :]
