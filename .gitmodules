@@ -1,0 +1,3 @@
+[submodule "pinocchio_optimization"]
+	path = pinocchio_optimization
+	url = https://github.com/Gwidi/pinocchio_optimization.git
